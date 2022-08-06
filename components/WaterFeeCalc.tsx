@@ -1,5 +1,12 @@
-import { StyleSheet, TouchableOpacity, TextInput, Button } from 'react-native';
-import { useState } from 'react';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  ToastAndroid,
+} from 'react-native';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Colors from '../constants/Colors';
 import { MonoText } from './StyledText';
@@ -12,10 +19,33 @@ import { Text, View } from './Themed';
 export default function WaterFeeCalc() {
   const [lastMonthVal, setLastMonthVal] = useState('0');
   const [thisMonthVal, setThisMonthVal] = useState('0');
+  const [unitPrice, setUnitPrice] = useState('0');
   const [fee, setFee] = useState('0');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetchedUnitPrice = await AsyncStorage.getItem('waterPrice');
+      if (fetchedUnitPrice !== null) {
+        // TODO refactor fetch code to an external common component
+        setUnitPrice(fetchedUnitPrice);
+        ToastAndroid.show('Nạp thành công đơn giá', 5000);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const calculateWaterFee = () => {
+    const unitPriceVal = parseInt(unitPrice);
+    if (!unitPriceVal) {
+      ToastAndroid.show(
+        'Đơn giá chưa được nạp thành công, vui lòng vào Cài đặt để thiết lập!',
+        5000
+      );
+      return;
+    }
     let calculatedFee =
-      (parseInt(thisMonthVal) - parseInt(lastMonthVal)) * 20000;
+      (parseInt(thisMonthVal) - parseInt(lastMonthVal)) * parseInt(unitPrice);
     setFee(calculatedFee.toString());
   };
   return (
