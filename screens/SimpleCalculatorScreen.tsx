@@ -8,8 +8,13 @@ export default function SimpleCalculatorScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Simple Calculator</Text>
-      <WaterFeeCalc />
-      <EditScreenInfo path='/screens/SimpleCalculatorScreen.tsx' />
+      <WaterFeeCalc title='Tính tiền điện' mode='water' />
+      <View
+        style={styles.separator}
+        lightColor='#eee'
+        darkColor='rgba(255,255,255,0.1)'
+      />
+      <WaterFeeCalc title='Tính tiền nước' mode='electricity' />
     </View>
   );
 }

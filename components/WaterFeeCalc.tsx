@@ -16,15 +16,24 @@ import { Text, View } from './Themed';
 // button
 // logic
 
-export default function WaterFeeCalc() {
+export default function WaterFeeCalc(props) {
   const [lastMonthVal, setLastMonthVal] = useState('0');
   const [thisMonthVal, setThisMonthVal] = useState('0');
   const [unitPrice, setUnitPrice] = useState('0');
   const [fee, setFee] = useState('0');
+  const [modeTitle, setModeTitle] = useState('');
 
   useEffect(() => {
+    if (props.mode == 'water') setModeTitle('nước');
+    else if (props.mode == 'electricity') setModeTitle('điện');
+    // if needed, add new mode here
+
     const fetchData = async () => {
-      const fetchedUnitPrice = await AsyncStorage.getItem('waterPrice');
+      let itemTitle = '';
+      if (props.mode == 'water') itemTitle = 'waterPrice';
+      else if (props.mode == 'electricity') itemTitle = 'electricityPrice';
+
+      const fetchedUnitPrice = await AsyncStorage.getItem(itemTitle);
       if (fetchedUnitPrice !== null) {
         // TODO refactor fetch code to an external common component
         setUnitPrice(fetchedUnitPrice);
@@ -48,11 +57,12 @@ export default function WaterFeeCalc() {
       (parseInt(thisMonthVal) - parseInt(lastMonthVal)) * parseInt(unitPrice);
     setFee(calculatedFee.toString());
   };
+
   return (
     <View style={styles.waterCalc}>
-      <Text>Hello, start calculating water fee</Text>
+      <Text>{props.title}</Text>
       {/* input last month */}
-      <Text>Nhập số nước tháng trước</Text>
+      <Text>Nhập số {modeTitle} tháng trước</Text>
       <TextInput
         style={styles.inputValue}
         onChangeText={setLastMonthVal}
@@ -61,7 +71,7 @@ export default function WaterFeeCalc() {
       />
       {/* TODO last lang file for extension */}
       {/* input this month */}
-      <Text>Nhập số nước tháng này</Text>
+      <Text>Nhập số {modeTitle} tháng này</Text>
       <TextInput
         style={styles.inputValue}
         onChangeText={setThisMonthVal}
@@ -85,6 +95,8 @@ export default function WaterFeeCalc() {
 const styles = StyleSheet.create({
   waterCalc: {
     backgroundColor: 'yellow',
+    width: '80%',
+    borderRadius: 5,
   },
 
   inputValue: {
